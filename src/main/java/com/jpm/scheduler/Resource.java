@@ -25,11 +25,16 @@ public class Resource {
         this.queue = queue;
     }
 
-    public void send(ConcreteMessage message) {
-        messageUnderProcess = message;
+    public void send() {
+
+        if (messageUnderProcess == null) {
+            LOGGER.warn("Message under process is null");
+            return;
+        }
+
         messageUnderProcess.setResource(this);
         LOGGER.info("Send message: " + messageUnderProcess);
-        gateway.send(message);
+        gateway.send(messageUnderProcess);
     }
 
     /**
@@ -38,7 +43,9 @@ public class Resource {
      * @return true if wrapped resource is idle and false else
      */
     public boolean accept() {
-        return messageUnderProcess == null;
+        synchronized (queue) {
+            return messageUnderProcess == null && hasMessageToProcess(null);
+        }
     }
 
     /**
@@ -46,8 +53,8 @@ public class Resource {
      */
     void notifyCompletion() {
         LOGGER.debug("Message processed successfully: " + messageUnderProcess);
-        if (hasMessageToProcess()) {
-            send(messageUnderProcess);
+        if (hasMessageToProcess(messageUnderProcess.getGroupId())) {
+            send();
         }
     }
 
@@ -57,9 +64,9 @@ public class Resource {
      *
      * @return true, if the are pending messages
      */
-    private boolean hasMessageToProcess() {
+    private boolean hasMessageToProcess(String filter) {
         synchronized (queue) {
-            messageUnderProcess = queue.dequeue(null);
+            messageUnderProcess = queue.dequeue(filter);
             if (messageUnderProcess == null) {
                 LOGGER.debug("No pending messages.");
                 return false;

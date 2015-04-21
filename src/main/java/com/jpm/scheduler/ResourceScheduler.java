@@ -33,21 +33,33 @@ public class ResourceScheduler {
         }
     }
 
+    /**
+     * Send the message to the first idle resource or queue it.
+     *
+     * @param message
+     *            the message to be processed
+     */
     public void process(final ConcreteMessage message) {
         queue.enqueue(message);
-        executorService.execute(new Runnable() {
+        final Resource idle = getIdleResource();
+        if (idle != null) {
+            executorService.execute(new Runnable() {
 
-            @Override
-            public void run() {
-                for (Resource resource : resources) {
-                    if (resource.accept()) {
-                        ConcreteMessage first = queue.dequeue(null);
-                        resource.send(first);
-                        return;
-                    }
+                @Override
+                public void run() {
+                    idle.send();
                 }
+            });
+        }
+    }
+
+    private Resource getIdleResource() {
+        for (Resource resource : resources) {
+            if (resource.accept()) {
+                return resource;
             }
-        });
+        }
+        return null;
     }
 
     public int getPendingMessages() {
