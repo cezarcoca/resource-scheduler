@@ -1,5 +1,7 @@
 package com.jpm.scheduler;
 
+import org.apache.log4j.Logger;
+
 import com.external.Gateway;
 
 /**
@@ -11,16 +13,22 @@ import com.external.Gateway;
  */
 public class Resource {
 
+    private static final Logger LOGGER = Logger.getLogger(Resource.class);
+
     private Gateway gateway;
     private ConcreteMessage messageUnderProcess;
+    private MessagesQueue queue;
 
-    public Resource(GatewayFactory factory) {
-        gateway = factory.getGateway();
-        messageUnderProcess = null;
+    public Resource(GatewayFactory factory, MessagesQueue queue) {
+        this.gateway = factory.getGateway();
+        this.messageUnderProcess = null;
+        this.queue = queue;
     }
 
     public void send(ConcreteMessage message) {
         messageUnderProcess = message;
+        messageUnderProcess.setResource(this);
+        LOGGER.info("Send message: " + messageUnderProcess);
         gateway.send(message);
     }
 
@@ -31,5 +39,34 @@ public class Resource {
      */
     public boolean accept() {
         return messageUnderProcess == null;
+    }
+
+    /**
+     * Notify completion of message processing.
+     */
+    void notifyCompletion() {
+        LOGGER.debug("Message processed successfully: " + messageUnderProcess);
+        if (hasMessageToProcess()) {
+            send(messageUnderProcess);
+        }
+    }
+
+    /**
+     * Checks for next message to process. If message is found, the message is
+     * removed from the queue and is set as current message under process.
+     *
+     * @return true, if the are pending messages
+     */
+    private boolean hasMessageToProcess() {
+        synchronized (queue) {
+            messageUnderProcess = queue.dequeue();
+            if (messageUnderProcess == null) {
+                LOGGER.debug("No pending messages.");
+                return false;
+            }
+            messageUnderProcess.setResource(this);
+        }
+
+        return true;
     }
 }

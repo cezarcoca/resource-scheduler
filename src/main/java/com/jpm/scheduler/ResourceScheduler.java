@@ -15,7 +15,7 @@ public class ResourceScheduler {
 
     private List<Resource> resources;
     private ExecutorService executorService;
-    private List<ConcreteMessage> queue;
+    private MessagesQueue queue;
 
     public ResourceScheduler(int noOfResources, GatewayFactory factory) {
 
@@ -26,22 +26,22 @@ public class ResourceScheduler {
         }
 
         executorService = Executors.newFixedThreadPool(noOfResources + 1);
-        queue = new ArrayList<ConcreteMessage>();
+        queue = new MessagesQueue();
         resources = new ArrayList<Resource>();
         for (int i = 0; i < noOfResources; i++) {
-            resources.add(new Resource(factory));
+            resources.add(new Resource(factory, queue));
         }
     }
 
     public void process(final ConcreteMessage message) {
-        queue.add(message);
+        queue.enqueue(message);
         executorService.execute(new Runnable() {
 
             @Override
             public void run() {
                 for (Resource resource : resources) {
                     if (resource.accept()) {
-                        ConcreteMessage first = queue.remove(0);
+                        ConcreteMessage first = queue.dequeue();
                         resource.send(first);
                         return;
                     }

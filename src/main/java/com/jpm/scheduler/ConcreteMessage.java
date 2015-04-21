@@ -11,6 +11,7 @@ public class ConcreteMessage implements Message {
 
     private String groupId;
     private String payload;
+    private Resource resource;
 
     public ConcreteMessage(String groupId, String payload) {
         super();
@@ -20,8 +21,7 @@ public class ConcreteMessage implements Message {
 
     @Override
     public void completed() {
-        // TODO Auto-generated method stub
-
+        resource.notifyCompletion();
     }
 
     public String getGroupId() {
@@ -32,4 +32,7 @@ public class ConcreteMessage implements Message {
         return payload;
     }
 
+    public void setResource(Resource resource) {
+        this.resource = resource;
+    }
 }

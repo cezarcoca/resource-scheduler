@@ -49,3 +49,13 @@ To implement this behavior the following decision were made:
 
 For a single resource, when two messages are received, only the first message is sent to the gateway
 
+- To implement this behavior a queue was added to the **ResourceScheduler**. The message is first put on the queue and after that the **ResourceScheduler** check if they are **Resource** available to process the first message from the queue.
+
+### Responding ###
+
+As messages are completed, if there are queued messages, they should be processed.
+
+- We choose to implement this functionality int the `completed()` callback method that is invoked after the external resource finish to process the message. The **Resource** will try to get the next unprocessed message from the queue and to send it to the **Gateway**. Because the queue is now a shared resource (with **ResourceScheduler** as producer and multiple **Resources** as consumers) we've chosen to encapsulate it in its own class.
+- We added the **AsyncSpyGateway** fake object to test this more complicated asynchronous scenario. This class simulate a real processing resource. It sleep for a specified amount of time (the message payload set on the test arrange phase) and after that, call the message `completed()` callback method allowing us to write component integration tests.
+
+
