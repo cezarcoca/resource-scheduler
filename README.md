@@ -25,12 +25,12 @@ Before starting to implement this behavior we should take in account the followi
 
 The resource state transition table is depicted below:
 
-| Current state | Method        | Nest state   |
-| ------------- | ------------- | -------------|
-|Idle           | send          | Busy         |
-|Idle           | not send      | Idle         |
-|Busy           | completed     | Idle         |
-|Busy           | not completed | Busy         |
+| Current state | Method          | Next state   |
+| ------------- | -------------   | -------------|
+|Idle           | *send *         | Busy         |
+|Idle           | *not send*      | Idle         |
+|Busy           | *completed*     | Idle         |
+|Busy           | *not completed* | Busy         |
 
 To implement this behavior the following decision were made:
 
@@ -64,5 +64,6 @@ If there are messages belonging to multiple groups in the queue, as resources be
 already started.
 
 - Modified **MessagesQueue** and added filter support for `dequeue()` method.
+- Modified **Resource** to use the group id of previous processed message and to use it for obtaining the next message to process.
 
 
