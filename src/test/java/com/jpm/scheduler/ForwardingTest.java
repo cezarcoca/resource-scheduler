@@ -9,8 +9,13 @@ public class ForwardingTest {
     private ResourceScheduler sut;
 
     @Test(expected = NullPointerException.class)
-    public void shouldThrowExceptionIfGatewayIsNull() {
+    public void shouldThrowExceptionIfGatewayFactoryIsNull() {
         sut = new ResourceScheduler(1, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowExceptionIfNoOfResourcesIsLessThanOne() {
+        sut = new ResourceScheduler(0, new SpyGatewayFactory());
     }
 
     @Test
