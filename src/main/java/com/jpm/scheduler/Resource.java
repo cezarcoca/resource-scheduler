@@ -59,7 +59,7 @@ public class Resource {
      */
     private boolean hasMessageToProcess() {
         synchronized (queue) {
-            messageUnderProcess = queue.dequeue();
+            messageUnderProcess = queue.dequeue(null);
             if (messageUnderProcess == null) {
                 LOGGER.debug("No pending messages.");
                 return false;

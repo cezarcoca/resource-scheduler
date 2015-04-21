@@ -31,9 +31,16 @@ public class MessagesQueue {
         queue.add(message);
     }
 
-    public synchronized ConcreteMessage dequeue() {
+    public synchronized ConcreteMessage dequeue(String filter) {
         if (queue.isEmpty()) {
             return null;
+        }
+
+        for (int i = 0; i < queue.size(); i++) {
+            ConcreteMessage message = queue.get(i);
+            if (message.getGroupId().equals(filter)) {
+                return queue.remove(i);
+            }
         }
 
         return queue.remove(0);

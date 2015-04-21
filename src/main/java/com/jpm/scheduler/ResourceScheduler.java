@@ -41,7 +41,7 @@ public class ResourceScheduler {
             public void run() {
                 for (Resource resource : resources) {
                     if (resource.accept()) {
-                        ConcreteMessage first = queue.dequeue();
+                        ConcreteMessage first = queue.dequeue(null);
                         resource.send(first);
                         return;
                     }
