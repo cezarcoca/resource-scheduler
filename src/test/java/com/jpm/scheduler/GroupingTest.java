@@ -41,8 +41,8 @@ public class GroupingTest {
 
         sut.process(new ConcreteMessage(GROUP1, String.valueOf(2)));
         sut.process(new ConcreteMessage(GROUP2, String.valueOf(1)));
-        sut.process(new ConcreteMessage(GROUP2, String.valueOf(2)));
         sut.process(new ConcreteMessage(GROUP1, String.valueOf(1)));
+        sut.process(new ConcreteMessage(GROUP2, String.valueOf(2)));
 
         retry.execute(new Task() {
 
