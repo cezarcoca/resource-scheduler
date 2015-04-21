@@ -2,14 +2,16 @@ package com.jpm.scheduler;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author ccoca
  *
  */
 public class ResourceScheduler {
 
-    private GatewayFactory factory;
-    private int noOfResources;
+    private List<Resource> resources;
 
     public ResourceScheduler(int noOfResources, GatewayFactory factory) {
 
@@ -19,12 +21,19 @@ public class ResourceScheduler {
                     "No of resources should not be less than 1");
         }
 
-        this.factory = factory;
-        this.noOfResources = noOfResources;
+        resources = new ArrayList<Resource>();
+        for (int i = 0; i < noOfResources; i++) {
+            resources.add(new Resource(factory));
+        }
     }
 
     public void process(ConcreteMessage message) {
-        factory.getGateway().send(message);
+        for (Resource resource : resources) {
+            if (resource.accept()) {
+                resource.send(message);
+                return;
+            }
+        }
     }
 
 }

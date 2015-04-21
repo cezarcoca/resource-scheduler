@@ -34,3 +34,4 @@ The resource state transition table is depicted below:
 
 To implement this behavior the following decision were made:
 - Modified the **ResourceScheduler** to receive the number of resources available. Also we choose delegate the responsibility of **Gateway's** creation to a different class / classes that implements the **GatewayFactory** interface.
+- Wrapped the **Gateway** in a **Resource** and added support for idle detection.

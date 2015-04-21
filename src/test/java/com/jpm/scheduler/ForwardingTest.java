@@ -27,11 +27,22 @@ public class ForwardingTest {
         ConcreteMessage expected = new ConcreteMessage("groupId", "payload");
         sut.process(expected);
 
-        assertEquals(expected, factory.spy.getMessage());
+        assertEquals(expected, factory.gateways.get(0).getMessage());
     }
 
     @Test
     public void shouldSendMultipleMessagesInParallelIfMultipleResourcesAreAvailable() {
 
+        SpyGatewayFactory factory = new SpyGatewayFactory();
+        sut = new ResourceScheduler(2, factory);
+
+        ConcreteMessage message1 = new ConcreteMessage("groupId1", "payload1");
+        ConcreteMessage message2 = new ConcreteMessage("groupId2", "payload2");
+
+        sut.process(message1);
+        sut.process(message2);
+
+        assertEquals(message1, factory.gateways.get(0).getMessage());
+        assertEquals(message2, factory.gateways.get(1).getMessage());
     }
 }
