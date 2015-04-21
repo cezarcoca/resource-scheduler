@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -52,4 +53,31 @@ public class RespondingTest {
         });
     }
 
+    @Test
+    public void shouldWakeUpWhenANewMessageIsSent() throws InterruptedException {
+
+        sut = new ResourceScheduler(1, factory);
+
+        sut.process(new ConcreteMessage("group1", String.valueOf(1)));
+
+        retry.execute(new Task() {
+
+            @Override
+            public boolean isDone() {
+                return spy.get(0).size() == 1;
+            }
+        });
+
+        TimeUnit.SECONDS.sleep(1);
+
+        sut.process(new ConcreteMessage("group2", String.valueOf(1)));
+
+        retry.execute(new Task() {
+
+            @Override
+            public boolean isDone() {
+                return spy.get(0).size() == 2;
+            }
+        });
+    }
 }
