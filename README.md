@@ -27,10 +27,12 @@ The resource state transition table is depicted below:
 
 | Current state | Method          | Next state   |
 | ------------- | -------------   | -------------|
-|Idle           | *send *         | Busy         |
+|Idle           | *send*          | Busy         |
 |Idle           | *not send*      | Idle         |
 |Busy           | *completed*     | Idle         |
 |Busy           | *not completed* | Busy         |
+
+![Software Life Cycle](https://4d7f3ccfc784b13605de2780f0f4bf21ee2162f6.googledrive.com/host/0B9tMA3RbZ5P_VS11Nk0yWkpNeXM/resource.png)
 
 To implement this behavior the following decision were made:
 
