@@ -43,5 +43,9 @@ To implement this behavior the following decision were made:
 > After adding multi-threading support some of the tests failed. This is because the assertions were made in the JUnit thread and messages are sent on different threads. We've applied some asynchronous testing techniques to fix the tests:
 > 
 > 1. Added **SyncRetryPolicy** class. This is configured at construction time with two parameters: number of retries and sleep time between retries. If total time is exceed and the expectation is not fulfilled the test is marked as failed.
-> 2. Added **Task** interface - this is implemented in each test and it is an abstractions of test expectation. 
+> 2. Added **Task** interface - this is implemented in each test and it is an abstraction of test expectation. 
+
+### Queuing ###
+
+For a single resource, when two messages are received, only the first message is sent to the gateway
 
