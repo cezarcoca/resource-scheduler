@@ -1,12 +1,20 @@
 package com.jpm.scheduler;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Before;
 import org.junit.Test;
+
+import com.jpm.scheduler.retry.SyncRetryPolicy;
+import com.jpm.scheduler.retry.Task;
 
 public class ForwardingTest {
 
     private ResourceScheduler sut;
+    private SyncRetryPolicy retry;
+
+    @Before
+    public void setUp() {
+        retry = new SyncRetryPolicy(1, 30);
+    }
 
     @Test(expected = NullPointerException.class)
     public void shouldThrowExceptionIfGatewayFactoryIsNull() {
@@ -21,28 +29,51 @@ public class ForwardingTest {
     @Test
     public void shouldSendTheMessageToTheGatewayWhenOneResourceIsAvailable() {
 
-        SpyGatewayFactory factory = new SpyGatewayFactory();
+        final SpyGatewayFactory factory = new SpyGatewayFactory();
         sut = new ResourceScheduler(1, factory);
 
-        ConcreteMessage expected = new ConcreteMessage("groupId", "payload");
+        final ConcreteMessage expected = new ConcreteMessage("groupId",
+                "payload");
         sut.process(expected);
 
-        assertEquals(expected, factory.gateways.get(0).getMessage());
+        retry.execute(new Task() {
+
+            @Override
+            public boolean isDone() {
+                return expected.equals(factory.gateways.get(0).getMessage());
+            }
+        });
+
     }
 
     @Test
     public void shouldSendMultipleMessagesInParallelIfMultipleResourcesAreAvailable() {
 
-        SpyGatewayFactory factory = new SpyGatewayFactory();
+        final SpyGatewayFactory factory = new SpyGatewayFactory();
         sut = new ResourceScheduler(2, factory);
 
-        ConcreteMessage message1 = new ConcreteMessage("groupId1", "payload1");
-        ConcreteMessage message2 = new ConcreteMessage("groupId2", "payload2");
+        final ConcreteMessage message1 = new ConcreteMessage("groupId1",
+                "payload1");
+        final ConcreteMessage message2 = new ConcreteMessage("groupId2",
+                "payload2");
 
         sut.process(message1);
         sut.process(message2);
 
-        assertEquals(message1, factory.gateways.get(0).getMessage());
-        assertEquals(message2, factory.gateways.get(1).getMessage());
+        retry.execute(new Task() {
+
+            @Override
+            public boolean isDone() {
+                return message1.equals(factory.gateways.get(0).getMessage());
+            }
+        });
+
+        retry.execute(new Task() {
+
+            @Override
+            public boolean isDone() {
+                return message2.equals(factory.gateways.get(1).getMessage());
+            }
+        });
     }
 }

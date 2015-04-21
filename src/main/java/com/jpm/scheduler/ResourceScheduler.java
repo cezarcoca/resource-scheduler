@@ -4,6 +4,8 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author ccoca
@@ -12,6 +14,7 @@ import java.util.List;
 public class ResourceScheduler {
 
     private List<Resource> resources;
+    private ExecutorService executorService;
 
     public ResourceScheduler(int noOfResources, GatewayFactory factory) {
 
@@ -21,19 +24,26 @@ public class ResourceScheduler {
                     "No of resources should not be less than 1");
         }
 
+        executorService = Executors.newFixedThreadPool(noOfResources + 1);
         resources = new ArrayList<Resource>();
         for (int i = 0; i < noOfResources; i++) {
             resources.add(new Resource(factory));
         }
     }
 
-    public void process(ConcreteMessage message) {
-        for (Resource resource : resources) {
-            if (resource.accept()) {
-                resource.send(message);
-                return;
+    public void process(final ConcreteMessage message) {
+        executorService.execute(new Runnable() {
+
+            @Override
+            public void run() {
+                for (Resource resource : resources) {
+                    if (resource.accept()) {
+                        resource.send(message);
+                        return;
+                    }
+                }
             }
-        }
+        });
     }
 
 }

@@ -21,7 +21,7 @@ Before starting to implement this behavior we should take in account the followi
 
 - we need a way to check if a resource is idle or not 
 - the **ResourceScheduler** should act as a router sending the received message to the next idle resource
-- messages should be processed in parallel (multithreading on a multi-core machine)
+- messages should be processed in parallel (multi-threading on a multi-core machine)
 
 The resource state transition table is depicted below:
 
@@ -33,5 +33,15 @@ The resource state transition table is depicted below:
 |Busy           | not completed | Busy         |
 
 To implement this behavior the following decision were made:
-- Modified the **ResourceScheduler** to receive the number of resources available. Also we choose delegate the responsibility of **Gateway's** creation to a different class / classes that implements the **GatewayFactory** interface.
+
+- Modified the **ResourceScheduler** to receive the number of resources available. Also we choose to delegate the responsibility of **Gateway's** creation to a different class / classes that implements the **GatewayFactory** interface.
 - Wrapped the **Gateway** in a **Resource** and added support for idle detection.
+- Added a thread pool on the **ResourceScheduler** and modified the processing method accordingly.
+
+> **Important**
+> 
+> After adding multi-threading support some of the tests failed. This is because the assertions were made in the JUnit thread and messages are sent on different threads. We've applied some asynchronous testing techniques to fix the tests:
+> 
+> 1. Added **SyncRetryPolicy** class. This is configured at construction time with two parameters: number of retries and sleep time between retries. If total time is exceed and the expectation is not fulfilled the test is marked as failed.
+> 2. Added **Task** interface - this is implemented in each test and it is an abstractions of test expectation. 
+
