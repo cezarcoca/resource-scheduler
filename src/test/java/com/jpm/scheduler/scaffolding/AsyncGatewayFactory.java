@@ -1,10 +1,11 @@
-package com.jpm.scheduler;
+package com.jpm.scheduler.scaffolding;
 
 import java.util.List;
 import java.util.Map;
 
 import com.external.Gateway;
 import com.external.Message;
+import com.jpm.scheduler.GatewayFactory;
 
 public class AsyncGatewayFactory implements GatewayFactory {
 

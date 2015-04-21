@@ -1,4 +1,4 @@
-package com.jpm.scheduler;
+package com.jpm.scheduler.scaffolding;
 
 import com.external.Gateway;
 import com.external.Message;

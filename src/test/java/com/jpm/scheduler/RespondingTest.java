@@ -11,6 +11,7 @@ import org.junit.Test;
 import com.external.Message;
 import com.jpm.scheduler.retry.SyncRetryPolicy;
 import com.jpm.scheduler.retry.Task;
+import com.jpm.scheduler.scaffolding.AsyncGatewayFactory;
 
 public class RespondingTest {
 

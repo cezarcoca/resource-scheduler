@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import com.jpm.scheduler.retry.SyncRetryPolicy;
 import com.jpm.scheduler.retry.Task;
+import com.jpm.scheduler.scaffolding.SpyGatewayFactory;
 
 public class ForwardingTest {
 
@@ -40,7 +41,8 @@ public class ForwardingTest {
 
             @Override
             public boolean isDone() {
-                return expected.equals(factory.gateways.get(0).getMessage());
+                return expected.equals(factory.getGateways().get(0)
+                        .getMessage());
             }
         });
 
@@ -64,7 +66,8 @@ public class ForwardingTest {
 
             @Override
             public boolean isDone() {
-                return message1.equals(factory.gateways.get(0).getMessage());
+                return message1.equals(factory.getGateways().get(0)
+                        .getMessage());
             }
         });
 
@@ -72,7 +75,8 @@ public class ForwardingTest {
 
             @Override
             public boolean isDone() {
-                return message2.equals(factory.gateways.get(1).getMessage());
+                return message2.equals(factory.getGateways().get(1)
+                        .getMessage());
             }
         });
     }

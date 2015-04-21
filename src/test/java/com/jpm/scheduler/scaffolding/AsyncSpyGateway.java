@@ -1,4 +1,4 @@
-package com.jpm.scheduler;
+package com.jpm.scheduler.scaffolding;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import com.external.Gateway;
 import com.external.Message;
+import com.jpm.scheduler.ConcreteMessage;
 
 public class AsyncSpyGateway implements Gateway {
 

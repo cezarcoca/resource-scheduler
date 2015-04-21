@@ -2,6 +2,8 @@ package com.jpm.scheduler;
 
 import static org.junit.Assert.assertEquals;
 
+import com.jpm.scheduler.scaffolding.SpyGatewayFactory;
+
 public class QueuingTest {
 
     private ResourceScheduler sut;
