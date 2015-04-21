@@ -2,24 +2,22 @@ package com.jpm.scheduler;
 
 import static java.util.Objects.requireNonNull;
 
-import com.external.Gateway;
-
 /**
  * @author ccoca
  *
  */
 public class ResourceScheduler {
 
-    private Gateway gateway;
+    private GatewayFactory factory;
 
-    public ResourceScheduler(Gateway gateway) {
+    public ResourceScheduler(int noOfResources, GatewayFactory factory) {
         super();
-        requireNonNull(gateway, "Gateway cannot be null.");
-        this.gateway = gateway;
+        requireNonNull(factory, "Gateway Factory cannot be null.");
+        this.factory = factory;
     }
 
     public void process(ConcreteMessage message) {
-        gateway.send(message);
+        factory.getGateway().send(message);
     }
 
 }

@@ -10,18 +10,23 @@ public class ForwardingTest {
 
     @Test(expected = NullPointerException.class)
     public void shouldThrowExceptionIfGatewayIsNull() {
-        sut = new ResourceScheduler(null);
+        sut = new ResourceScheduler(1, null);
     }
 
     @Test
     public void shouldSendTheMessageToTheGatewayWhenOneResourceIsAvailable() {
 
-        SpyGateway spy = new SpyGateway();
-        sut = new ResourceScheduler(spy);
+        SpyGatewayFactory factory = new SpyGatewayFactory();
+        sut = new ResourceScheduler(1, factory);
 
         ConcreteMessage expected = new ConcreteMessage("groupId", "payload");
         sut.process(expected);
 
-        assertEquals(expected, spy.getMessage());
+        assertEquals(expected, factory.spy.getMessage());
+    }
+
+    @Test
+    public void shouldSendMultipleMessagesInParallelIfMultipleResourcesAreAvailable() {
+
     }
 }
