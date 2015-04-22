@@ -2,12 +2,15 @@ package com.jpm.scheduler;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Test;
+
 import com.jpm.scheduler.scaffolding.SpyGatewayFactory;
 
 public class QueuingTest {
 
     private ResourceScheduler sut;
 
+    @Test
     public void shouldQueueTheMessagesWhenNoResourcesAreAvailable() {
 
         final SpyGatewayFactory factory = new SpyGatewayFactory();
