@@ -7,6 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import com.jpm.scheduler.prioritisation.PrioritisationByGroupName;
+import com.jpm.scheduler.prioritisation.PrioritisationFilter;
+
 /**
  * @author ccoca
  * 
@@ -17,10 +20,12 @@ public class MessagesQueue {
 
     private List<ConcreteMessage> queue;
     private Set<String> cancelledGroups;
+    private PrioritisationFilter prioritisationFilter;
 
     public MessagesQueue() {
         queue = new LinkedList<ConcreteMessage>();
         cancelledGroups = new HashSet<String>();
+        prioritisationFilter = new PrioritisationByGroupName();
     }
 
     /**
@@ -48,7 +53,7 @@ public class MessagesQueue {
                 continue;
             }
 
-            if (message.getGroupId().equals(filter)) {
+            if (prioritisationFilter.match(message, filter)) {
                 return queue.remove(i);
             }
         }
