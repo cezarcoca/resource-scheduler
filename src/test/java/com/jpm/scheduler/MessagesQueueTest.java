@@ -1,8 +1,11 @@
 package com.jpm.scheduler;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.jpm.scheduler.prioritisation.PrioritisationByGroupNamePrefix;
 
 public class MessagesQueueTest {
 
@@ -11,6 +14,11 @@ public class MessagesQueueTest {
     @Before
     public void setUp() {
         sut = new MessagesQueue();
+    }
+
+    @After
+    public void tearDown() {
+        System.setProperty(MessagesQueue.PRIORITISATION_STRATEGY, "");
     }
 
     @Test
@@ -52,5 +60,26 @@ public class MessagesQueueTest {
 
         Assert.assertEquals("Should return first matching element", second,
                 sut.dequeue(filter));
+    }
+
+    @Test
+    public void shouldUsePrioritisationByGroupNamePrefixStrategyIfSet() {
+
+        System.setProperty(MessagesQueue.PRIORITISATION_STRATEGY,
+                PrioritisationByGroupNamePrefix.class.getCanonicalName());
+
+        sut = new MessagesQueue();
+
+        String filter = "b#1";
+
+        ConcreteMessage first = new ConcreteMessage("a#1", "first");
+        ConcreteMessage second = new ConcreteMessage("b#2", "second");
+
+        sut.enqueue(first);
+        sut.enqueue(second);
+
+        Assert.assertEquals("Should return second element", second,
+                sut.dequeue(filter));
+
     }
 }

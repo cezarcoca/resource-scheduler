@@ -6,8 +6,9 @@ package com.jpm.scheduler.prioritisation;
 import com.jpm.scheduler.ConcreteMessage;
 
 /**
- * @author ccoca
+ * This strategy prioritize the messages by group name.
  *
+ * @author ccoca
  */
 public class PrioritisationByGroupName implements PrioritisationFilter {
 

@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import com.jpm.scheduler.prioritisation.PrioritisationByGroupName;
 import com.jpm.scheduler.prioritisation.PrioritisationFilter;
 
@@ -18,6 +20,9 @@ import com.jpm.scheduler.prioritisation.PrioritisationFilter;
  */
 public class MessagesQueue {
 
+    private static final Logger LOGGER = Logger.getLogger(MessagesQueue.class);
+    public static final String PRIORITISATION_STRATEGY = "com.jpm.scheduler.prioritisation.strategy";
+
     private List<ConcreteMessage> queue;
     private Set<String> cancelledGroups;
     private PrioritisationFilter prioritisationFilter;
@@ -25,7 +30,35 @@ public class MessagesQueue {
     public MessagesQueue() {
         queue = new LinkedList<ConcreteMessage>();
         cancelledGroups = new HashSet<String>();
-        prioritisationFilter = new PrioritisationByGroupName();
+        prioritisationFilter = getPrioritisationFilter();
+    }
+
+    /**
+     * Factory method - gets the prioritization strategy.
+     *
+     * @return the prioritization filter
+     */
+    private PrioritisationFilter getPrioritisationFilter() {
+        String strategyClassName = System.getProperty(PRIORITISATION_STRATEGY);
+
+        if (strategyClassName == null) {
+            LOGGER.info(String.format(
+                    "Default proritisation strategy was set: %s",
+                    PrioritisationByGroupName.class.getName()));
+            return new PrioritisationByGroupName();
+        }
+
+        try {
+            return (PrioritisationFilter) Class.forName(strategyClassName)
+                    .newInstance();
+        } catch (InstantiationException | IllegalAccessException
+                | ClassNotFoundException e) {
+            LOGGER.info(String
+                    .format("Class not found: %s. Default proritisation strategy was set: %s",
+                            strategyClassName,
+                            PrioritisationByGroupName.class.getName()));
+            return new PrioritisationByGroupName();
+        }
     }
 
     /**
