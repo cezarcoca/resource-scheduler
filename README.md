@@ -65,7 +65,17 @@ As messages are completed, if there are queued messages, they should be processe
 If there are messages belonging to multiple groups in the queue, as resources become available, we want to prioritise messages from groups
 already started.
 
-- Modified **MessagesQueue** and added filter support for `dequeue()` method.
+- Modified **MessagesQueue** and added filter support for `dequeue(String filter)` method.
 - Modified **Resource** to use the group id of previous processed message and to use it for obtaining the next message to process.
+
+## Extra credit ##
+
+### Cancellation ###
+
+It should be possible to tell the scheduler that a group of messages has now been cancelled. Once cancelled, no further messages from that
+group should sent to the Gateway.
+
+- We enhanced the **MessagesQueue** API and added the `addCancelledGroup(String groupId)` method. The cancelled groups are stored in a internal **Set** and when the `dequeue(String filter)` method is invoked, we check next matching message against this blacklist and skip and remove it from the queue if is the case.
+- We noticed that we need to remove from the middle of the **MessagesQueue** for both filtering and canceling operations, so we choose to replace the internal **List** implementation from **ArrayList** to **LinkedList** to improve the performance of those operations.
 
 

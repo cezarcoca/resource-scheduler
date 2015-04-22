@@ -2,8 +2,10 @@ package com.jpm.scheduler;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author ccoca
@@ -14,9 +16,11 @@ import java.util.List;
 public class MessagesQueue {
 
     private List<ConcreteMessage> queue;
+    private Set<String> cancelledGroups;
 
     public MessagesQueue() {
-        queue = new ArrayList<ConcreteMessage>();
+        queue = new LinkedList<ConcreteMessage>();
+        cancelledGroups = new HashSet<String>();
     }
 
     /**
@@ -38,9 +42,19 @@ public class MessagesQueue {
 
         for (int i = 0; i < queue.size(); i++) {
             ConcreteMessage message = queue.get(i);
+
+            if (cancelledGroups.contains(message.getGroupId())) {
+                queue.remove(i--);
+                continue;
+            }
+
             if (message.getGroupId().equals(filter)) {
                 return queue.remove(i);
             }
+        }
+
+        if (queue.isEmpty()) {
+            return null;
         }
 
         return queue.remove(0);
@@ -48,5 +62,9 @@ public class MessagesQueue {
 
     public synchronized int size() {
         return queue.size();
+    }
+
+    public synchronized void addCancelledGroup(String groupId) {
+        cancelledGroups.add(groupId);
     }
 }
